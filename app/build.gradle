@@ -5,6 +5,7 @@ android {
     buildToolsVersion '25.0.0'
 
     defaultConfig {
+        manifestPlaceholders = [HOCKEYAPP_APP_ID: "8e06045f2e1343a3b78245e52cd9a60c"]
         applicationId "demo.example.com.customarrayadapter"
         minSdkVersion 21
         targetSdkVersion 25
@@ -37,6 +38,7 @@ android {
 repositories {
     mavenCentral()
     maven { url "https://jitpack.io" }
+    jcenter()
 }
 
 
@@ -53,5 +55,6 @@ dependencies {
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha8'
     compile 'com.github.deano2390:FlowTextView:2.0.5'
+    compile 'net.hockeyapp.android:HockeySDK:5.0.2'
 }
 

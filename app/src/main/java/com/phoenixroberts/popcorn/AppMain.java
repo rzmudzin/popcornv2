@@ -10,6 +10,12 @@ import android.content.SharedPreferences;
 
 import com.phoenixroberts.popcorn.data.DataService;
 import com.phoenixroberts.popcorn.data.DataServiceBroadcastReceiver;
+import com.phoenixroberts.popcorn.logging.MetricDataType;
+import com.phoenixroberts.popcorn.logging.MetricsEventType;
+
+import net.hockeyapp.android.metrics.MetricsManager;
+
+import java.util.HashMap;
 
 
 public class AppMain extends Application {
@@ -20,6 +26,10 @@ public class AppMain extends Application {
     public void onCreate() {
         super.onCreate();
         m_Instance = this;
+        MetricsManager.register(this);
+        HashMap<String, String> properties = new HashMap<>();
+        properties.put(MetricDataType.Info, "App onCreate Invoked");
+        MetricsManager.trackEvent(MetricsEventType.AppStarted, properties, null);
         DataServiceBroadcastReceiver.getInstance().Register(getApplicationContext());
     }
 

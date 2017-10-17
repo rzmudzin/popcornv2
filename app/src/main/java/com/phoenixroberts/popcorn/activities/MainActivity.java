@@ -17,8 +17,12 @@ import com.phoenixroberts.popcorn.dialogs.DialogService;
 import com.phoenixroberts.popcorn.dialogs.Dialogs;
 import com.phoenixroberts.popcorn.dialogs.StatusDialog;
 import com.phoenixroberts.popcorn.fragments.MovieGridFragment;
+import com.phoenixroberts.popcorn.logging.MetricDataType;
+import com.phoenixroberts.popcorn.logging.MetricsEventType;
 import com.phoenixroberts.popcorn.threading.IDataServiceListener;
+import net.hockeyapp.android.metrics.MetricsManager;
 
+import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity implements IDataServiceListener {
     private Menu m_Menu;
@@ -74,8 +78,13 @@ public class MainActivity extends AppCompatActivity implements IDataServiceListe
                     AppSettings.set(AppSettings.Settings.APKI_Key, textInputEventArgs.getText());
                     DataService.getInstance().setAPIKey(textInputEventArgs.getText());
                     LoadData();
+                    HashMap<String, String> properties = new HashMap<>();
+                    properties.put(MetricDataType.Info, "API Key Updated");
+                    MetricsManager.trackEvent(MetricsEventType.Log, properties, null);
                 },
-                null,       //On cancel
+                (eventArgs) -> {
+                    //On cancel event handler
+                },
                 null));     //On text changed
     }
 
