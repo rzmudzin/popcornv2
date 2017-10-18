@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.GridView;
 
 import com.phoenixroberts.popcorn.activities.MainActivity;
+import com.phoenixroberts.popcorn.adapters.MovieDataRecyclerViewAdapter;
 import com.phoenixroberts.popcorn.data.DataServiceBroadcastReceiver;
 import com.phoenixroberts.popcorn.dialogs.DialogService;
 import com.phoenixroberts.popcorn.dialogs.Dialogs;
@@ -35,8 +38,8 @@ import java.util.List;
 public class MovieGridFragment extends Fragment implements IDataServiceListener {
 
     private List<Integer> m_ToolbarFilter = new ArrayList<Integer>();
-    private MovieDataListViewAdapter m_Adapter;
-    private GridView m_GridView;
+    private MovieDataRecyclerViewAdapter m_Adapter;
+    private RecyclerView m_GridView;
 
     public MovieGridFragment() {
         m_ToolbarFilter = new ArrayList<Integer>(Arrays.asList(new Integer [] {
@@ -51,12 +54,12 @@ public class MovieGridFragment extends Fragment implements IDataServiceListener 
         View v = inflater.inflate(R.layout.fragment_movie_grid, container, false);
 
         List<DTO.MoviesListItem> moviesData = DataService.getInstance().getMoviesData();
-        m_Adapter = new MovieDataListViewAdapter(this.getActivity(),
-                moviesData!=null?moviesData:new ArrayList<DTO.MoviesListItem>(),
-                R.layout.movie_grid_item);  //R.layout.fragment_movie_data_list
 
+        GridLayoutManager layoutManager = new GridLayoutManager(this.getActivity(),2);
+        m_Adapter = new MovieDataRecyclerViewAdapter(moviesData!=null?moviesData:new ArrayList<DTO.MoviesListItem>());
         // Get a reference to the ListView, and attach this adapter to it.
-        m_GridView = (GridView) v.findViewById(R.id.movies_grid);
+        m_GridView = (RecyclerView) v.findViewById(R.id.movies_grid);
+        m_GridView.setLayoutManager(layoutManager);
         m_GridView.setAdapter(m_Adapter);
         return v;
     }
@@ -80,7 +83,6 @@ public class MovieGridFragment extends Fragment implements IDataServiceListener 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        ((MainActivity)getActivity()).setToolbarFilter(m_ToolbarFilter);
         DataServiceBroadcastReceiver.getInstance().addListener(this);
     }
 
