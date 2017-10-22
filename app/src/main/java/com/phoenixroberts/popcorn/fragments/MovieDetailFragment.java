@@ -37,6 +37,8 @@ public class MovieDetailFragment extends Fragment implements IDataServiceListene
 
     private Integer m_MovieId;
     private View m_RootView;
+    private ImageView m_FavoriteIcon;
+    private boolean m_IsFavorite = false;
 
     public MovieDetailFragment() {
         // Required empty public constructor
@@ -102,7 +104,8 @@ public class MovieDetailFragment extends Fragment implements IDataServiceListene
 
     @Override
     public void onClick(View view) {
-
+        m_IsFavorite = !m_IsFavorite;
+        m_FavoriteIcon.setImageDrawable(getResources().getDrawable(m_IsFavorite?R.drawable.heart:R.drawable.heart_empty, getActivity().getTheme()));
     }
 
     @Override
@@ -120,6 +123,9 @@ public class MovieDetailFragment extends Fragment implements IDataServiceListene
         userRating.setText(movie.getVoteAverage().toString());
         ImageView imageView = (ImageView)m_RootView.findViewById(R.id.movieImage);
         loadImage(imageView, DataService.getInstance().getMovieDetailPosterPath(m_MovieId));
+        m_FavoriteIcon = (ImageView)m_RootView.findViewById(R.id.favoriteIcon);
+        m_FavoriteIcon.setOnClickListener(this);
+        m_FavoriteIcon.setImageDrawable(getResources().getDrawable(m_IsFavorite?R.drawable.heart:R.drawable.heart_empty, getActivity().getTheme()));
         return m_RootView;
     }
 

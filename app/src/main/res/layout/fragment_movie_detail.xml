@@ -57,40 +57,49 @@
                         app:layout_constraintDimensionRatio="H,2:3" />
                 </android.support.constraint.ConstraintLayout>
 
-                <LinearLayout
-                    android:orientation="vertical"
-                    android:gravity="left"
-                    android:paddingLeft="20dp"
-                    android:paddingTop="30dp"
+                <android.support.constraint.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
-
                     <TextView
                         android:text="2005"
                         android:textSize="25sp"
                         android:id="@+id/year"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
-
-                    <LinearLayout
-                        android:layout_marginTop="10dp"
-                        android:orientation="horizontal"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:layout_marginTop="32dp"
+                        android:layout_marginLeft="24dp"
+                        app:layout_constraintLeft_toLeftOf="parent" />
+                    <TextView
+                        android:text="7.8"
+                        android:textSize="20sp"
+                        android:id="@+id/user_rating"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-                        <TextView
-                            android:text="7.8"
-                            android:textSize="20sp"
-                            android:id="@+id/user_rating"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-                        <ImageView
-                            android:contentDescription="ratings_indicator_description"
-                            android:layout_marginLeft="10dp"
-                            android:src="@drawable/star_yellow_small"
-                            android:layout_width="20dp"
-                            android:layout_height="20dp" />
-                    </LinearLayout>
-                </LinearLayout>
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        app:layout_constraintTop_toBottomOf="@+id/year"
+                        android:layout_marginLeft="0dp"
+                        app:layout_constraintLeft_toLeftOf="@+id/year" />
+                    <ImageView
+                        android:contentDescription="ratings_indicator_description"
+                        android:src="@drawable/star_yellow_small"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginTop="8dp"
+                        app:layout_constraintTop_toBottomOf="@+id/year"
+                        app:layout_constraintLeft_toRightOf="@+id/user_rating"
+                        android:layout_marginLeft="8dp" />
+                    <ImageView
+                        android:id="@+id/favoriteIcon"
+                        android:contentDescription="ratings_indicator_description"
+                        android:src="@drawable/heart_empty"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginRight="16dp"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:layout_marginTop="16dp" />
+                </android.support.constraint.ConstraintLayout>
 
             </LinearLayout>
             <LinearLayout
@@ -98,12 +107,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                    <TextView
-                        android:id="@+id/description"
-                        android:text="Movie Description"
-                        android:textSize="20sp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                <TextView
+                    android:id="@+id/description"
+                    android:text="Movie Description"
+                    android:textSize="20sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
 
             </LinearLayout>
         </LinearLayout>
