@@ -20,6 +20,7 @@ import com.phoenixroberts.popcorn.AppMain;
 import com.phoenixroberts.popcorn.activities.MainActivity;
 import com.phoenixroberts.popcorn.data.DataServiceBroadcastReceiver;
 import com.phoenixroberts.popcorn.data.DTO;
+import com.phoenixroberts.popcorn.db.MoviesDatabase;
 import com.phoenixroberts.popcorn.threading.IDataServiceListener;
 import com.phoenixroberts.popcorn.R;
 import com.phoenixroberts.popcorn.data.DataService;
@@ -39,6 +40,8 @@ public class MovieDetailFragment extends Fragment implements IDataServiceListene
     private View m_RootView;
     private ImageView m_FavoriteIcon;
     private boolean m_IsFavorite = false;
+    private MoviesDatabase m_MoviesDatabase;
+    private DTO.MoviesListItem m_Movie;
 
     public MovieDetailFragment() {
         // Required empty public constructor
@@ -90,8 +93,15 @@ public class MovieDetailFragment extends Fragment implements IDataServiceListene
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        m_MoviesDatabase = new MoviesDatabase(this.getActivity());
         if(savedInstanceState!=null) {
             m_MovieId = savedInstanceState.getInt(AppMain.BundleExtraType.MovieId, m_MovieId);
+        }
+        if(m_MoviesDatabase.getFavorite(m_MovieId)!=null) {
+            m_IsFavorite=true;
+        }
+        else {
+            m_IsFavorite=false;
         }
         DataServiceBroadcastReceiver.getInstance().addListener(this);
     }
@@ -105,22 +115,29 @@ public class MovieDetailFragment extends Fragment implements IDataServiceListene
     @Override
     public void onClick(View view) {
         m_IsFavorite = !m_IsFavorite;
+        if(m_IsFavorite) {
+            m_MoviesDatabase.addFavorite(m_Movie);
+        }
+        else {
+            m_MoviesDatabase.deleteFavorite(m_MovieId);
+        }
         m_FavoriteIcon.setImageDrawable(getResources().getDrawable(m_IsFavorite?R.drawable.heart:R.drawable.heart_empty, getActivity().getTheme()));
+        m_MoviesDatabase.getFavorites();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-        DTO.MoviesListItem movie = DataService.getInstance().getMovieData(m_MovieId);
+        m_Movie = DataService.getInstance().getMovieData(m_MovieId);
         m_RootView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
         TextView title = (TextView)m_RootView.findViewById(R.id.title);
-        title.setText(movie.getTitle());
+        title.setText(m_Movie.getTitle());
         TextView description = (TextView)m_RootView.findViewById(R.id.description);
-        description.setText(movie.getOverview());
+        description.setText(m_Movie.getOverview());
         TextView year = (TextView)m_RootView.findViewById(R.id.year);
-        year.setText(movie.getReleaseDate());
+        year.setText(m_Movie.getReleaseDate());
         TextView userRating = (TextView)m_RootView.findViewById(R.id.user_rating);
-        userRating.setText(movie.getVoteAverage().toString());
+        userRating.setText(m_Movie.getVoteAverage().toString());
         ImageView imageView = (ImageView)m_RootView.findViewById(R.id.movieImage);
         loadImage(imageView, DataService.getInstance().getMovieDetailPosterPath(m_MovieId));
         m_FavoriteIcon = (ImageView)m_RootView.findViewById(R.id.favoriteIcon);
