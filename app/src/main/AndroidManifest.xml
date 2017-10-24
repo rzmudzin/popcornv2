@@ -20,6 +20,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <provider
+            android:exported="false"
+            android:authorities="com.phoenixroberts.popcorn"
+            android:name="com.phoenixroberts.popcorn.data.FavoritesContentProvider" />
     </application>
 
 </manifest>
