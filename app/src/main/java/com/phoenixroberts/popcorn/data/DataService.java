@@ -224,6 +224,7 @@ public class DataService {
             DTO.MoviesListItem mli = new DTO.MoviesListItem();
             mli.setId(f.getId());
             mli.setTitle(f.getTitle());
+            mli.setPosterPath(f.getPosterPath());
             m_MoviesList.add(mli);
         }
         broadcastDataServiceEvent(DataServiceBroadcastReceiver.DataServicesEventType.ListFetchSuccess, null);

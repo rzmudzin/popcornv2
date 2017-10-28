@@ -34,7 +34,9 @@ public class MoviesDatabase {
             int id = c.getInt(index);
             index = c.getColumnIndex(MoviesDBContracts.FavoritesTable.TITLE);
             String title = c.getString(index);
-            favoritesList.add(new FavoriteMovie(id,title));
+            index = c.getColumnIndex(MoviesDBContracts.FavoritesTable.POSTER_PATH);
+            String posterPath = c.getString(index);
+            favoritesList.add(new FavoriteMovie(id,title,posterPath));
         }
         c.close();
         return favoritesList;
@@ -43,7 +45,9 @@ public class MoviesDatabase {
         try {
             SQLiteDatabase db = m_MoviesDBHelper.getReadableDatabase();
             Cursor c = db.rawQuery(
-                    "SELECT " + MoviesDBContracts.FavoritesTable._ID + ", " + MoviesDBContracts.FavoritesTable.TITLE
+                    "SELECT " + MoviesDBContracts.FavoritesTable._ID + ", "
+                            + MoviesDBContracts.FavoritesTable.TITLE + ", "
+                            + MoviesDBContracts.FavoritesTable.POSTER_PATH
                             + " FROM " + MoviesDBContracts.FavoritesTable.TABLE_NAME
                             + " WHERE " + MoviesDBContracts.FavoritesTable._ID + "=" + Integer.toString(movieId),
                     null);
@@ -54,8 +58,10 @@ public class MoviesDatabase {
                 int id = c.getInt(index);
                 index = c.getColumnIndex(MoviesDBContracts.FavoritesTable.TITLE);
                 String title = c.getString(index);
+                index = c.getColumnIndex(MoviesDBContracts.FavoritesTable.POSTER_PATH);
+                String posterPath = c.getString(index);
                 c.close();
-                return new FavoriteMovie(id, title);
+                return new FavoriteMovie(id, title,posterPath);
             }
             c.close();
         }
@@ -75,6 +81,8 @@ public class MoviesDatabase {
             ContentValues contentValues = new ContentValues();
             contentValues.put(MoviesDBContracts.FavoritesTable._ID, movie.getId());
             contentValues.put(MoviesDBContracts.FavoritesTable.TITLE, movie.getTitle());
+            String posterPath = movie.getPosterPath();
+            contentValues.put(MoviesDBContracts.FavoritesTable.POSTER_PATH, posterPath);
             db.insert(MoviesDBContracts.FavoritesTable.TABLE_NAME, null, contentValues);
         }
         catch(Exception x) {

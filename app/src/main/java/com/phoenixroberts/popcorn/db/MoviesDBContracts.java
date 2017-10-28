@@ -15,5 +15,6 @@ public class MoviesDBContracts {
     public static class FavoritesTable implements BaseColumns {
         public static final String TABLE_NAME = "favorites";
         public static final String TITLE = "title";
+        public static final String POSTER_PATH = "poster_path";
     }
 }
