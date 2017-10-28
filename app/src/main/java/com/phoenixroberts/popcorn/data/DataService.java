@@ -13,6 +13,8 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.phoenixroberts.popcorn.AppMain;
 import com.phoenixroberts.popcorn.AppSettings;
+import com.phoenixroberts.popcorn.db.FavoriteMovie;
+import com.phoenixroberts.popcorn.db.MoviesDatabase;
 import com.phoenixroberts.popcorn.networking.DataServiceFetch;
 import com.phoenixroberts.popcorn.networking.IFetchResponseHandler;
 import com.phoenixroberts.popcorn.networking.IRESTResponse;
@@ -47,6 +49,7 @@ public class DataService {
     private List<DTO.MoviesListItem> m_MoviesList = new ArrayList<DTO.MoviesListItem>();
     private String m_DiscoverySortOrder;
     private String m_ListSortOrder;
+    private MoviesDatabase m_MoviesDatabase;
 
     public static class PosterSize {  //2:3
         public static final String W92 = "w92";
@@ -88,6 +91,7 @@ public class DataService {
     public static class MovieListSortOrder extends SortOrder{
         public static final String Popular = "popular";
         public static final String Highest_Rated = "top_rated";
+        public static final String Favorites = "favorites";
         public static boolean isValid(String sortOrder) {
             return values().stream()
                     .filter(v -> {
@@ -139,6 +143,7 @@ public class DataService {
     }
 
     private DataService() {
+        m_MoviesDatabase = new MoviesDatabase(AppMain.getAppContext());
         m_APIKey = AppSettings.get(AppSettings.Settings.APKI_Key);
         String defaultSortOrder = AppSettings.get(AppSettings.Settings.Discovery_Sort_Order);
         m_DiscoverySortOrder = defaultSortOrder.equals("")==false?defaultSortOrder: DiscoverySortOrder.Popular;
@@ -207,6 +212,24 @@ public class DataService {
         return fetchMoviesListData(null);
     }
     public UUID fetchMoviesListData(String sortOrder) {
+        if(MovieListSortOrder.Favorites.equals(m_ListSortOrder)){
+            return fetchMoviesLocalListData(sortOrder);
+        }
+        return fetchMoviesServiceListData(sortOrder);
+    }
+    private UUID fetchMoviesLocalListData(String sortOrder) {
+        m_MoviesList = new ArrayList<DTO.MoviesListItem>();
+        List<FavoriteMovie> favoritesList = m_MoviesDatabase.getFavorites();
+        for (FavoriteMovie f :favoritesList) {
+            DTO.MoviesListItem mli = new DTO.MoviesListItem();
+            mli.setId(f.getId());
+            mli.setTitle(f.getTitle());
+            m_MoviesList.add(mli);
+        }
+        broadcastDataServiceEvent(DataServiceBroadcastReceiver.DataServicesEventType.ListFetchSuccess, null);
+        return UUID.randomUUID();
+    }
+    private UUID fetchMoviesServiceListData(String sortOrder) {
         UUID uuid = UUID.randomUUID();
         try {
             String page = "&page=1";

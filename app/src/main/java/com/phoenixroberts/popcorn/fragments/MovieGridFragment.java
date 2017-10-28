@@ -19,6 +19,7 @@ import android.widget.GridView;
 import com.phoenixroberts.popcorn.activities.MainActivity;
 import com.phoenixroberts.popcorn.adapters.MovieDataRecyclerViewAdapter;
 import com.phoenixroberts.popcorn.data.DataServiceBroadcastReceiver;
+import com.phoenixroberts.popcorn.db.MoviesDatabase;
 import com.phoenixroberts.popcorn.dialogs.DialogService;
 import com.phoenixroberts.popcorn.dialogs.Dialogs;
 import com.phoenixroberts.popcorn.threading.IDataServiceListener;
