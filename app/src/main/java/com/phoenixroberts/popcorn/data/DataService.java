@@ -207,11 +207,19 @@ public class DataService {
         }
         return movie;
     }
+    private void updateMovieData(DTO.MoviesListItem  movie) {
+        if(movie!=null) {
+            m_MoviesList.removeIf(moviesListItem -> moviesListItem.getId().equals(movie.getId()));
+            m_MoviesList.add(movie);
+        }
+    }
 
     public UUID fetchListDiscoveryData() {
         return fetchMoviesListData(null);
     }
     public UUID fetchMoviesListData(String sortOrder) {
+        //Below consider using an array of callback functions to process the request
+        //Also, this is not really a sort order request but a fetchRequest - consider renaming things in accordance
         if(MovieListSortOrder.Favorites.equals(m_ListSortOrder)){
             return fetchMoviesLocalListData(sortOrder);
         }
@@ -225,6 +233,7 @@ public class DataService {
             mli.setId(f.getId());
             mli.setTitle(f.getTitle());
             mli.setPosterPath(f.getPosterPath());
+            mli.setRequiresRefresh(true);
             m_MoviesList.add(mli);
         }
         broadcastDataServiceEvent(DataServiceBroadcastReceiver.DataServicesEventType.ListFetchSuccess, null);
@@ -302,33 +311,60 @@ public class DataService {
         //individual movie fetch is below commented.
         HashMap<String, String> extras = new HashMap<String, String>();
         extras.put(DataServiceBroadcastReceiver.DataServicesEventExtra.MovieId.toString(), id.toString());
-        broadcastDataServiceEvent(DataServiceBroadcastReceiver.DataServicesEventType.ItemFetchSuccess, extras);
-        return UUID.randomUUID();
+        DTO.MoviesListItem movieListItem = getMovieData(id);
+        if(movieListItem != null && movieListItem.getRequiresRefresh()==false) {
+            broadcastDataServiceEvent(DataServiceBroadcastReceiver.DataServicesEventType.ItemFetchSuccess, extras);
+        }
+        else {
 
-//        UUID uuid = UUID.randomUUID();
-//        try {
-//            //https://api.themoviedb.org/3/movie/374720?api_key=437c0161cd02c1361b4f6d2446c3e376
-//            //String servicePath = "movie/".concat(id.toString()).concat("?api_key=437c0161cd02c1361b4f6d2446c3e376");
-//            String servicePath = "movie/" + id.toString() + "?api_key=437c0161cd02c1361b4f6d2446c3e376";
-//            String payloadData = null; //new Gson().toJson(new LoginDto(userId,userPwd));
-//            final String taskName = "Fetch Movie";
-//            DataServiceFetch dataSyncAction = new DataServiceFetch(m_DataServiceBasePath+servicePath,
-//                    null, payloadData, false);
-//            DataSync.DataSyncTask dataSyncTask = new DataSync.DataSyncTask(taskName,dataSyncAction);
-//            dataSyncAction.setResponseHandler(new IFetchResponseHandler() {
-//                @Override
-//                public void onResponse(IRESTResponse response) {
-//                    Log.d(getClass().toString(), "Executing Response Handler for " + taskName);
-//                    //processMovieFetchResponse(response);
-//                }
-//            });
-//            Log.d(getClass().toString(), "Executing Login");
-//            dataSyncTask.execute();
-//        }
-//        catch (Exception x) {
-//            Log.e(this.getClass().toString(), x.getMessage());
-//        }
-//        return uuid;
+            try {
+                String servicePath = "movie/" + id.toString() + "?api_key=437c0161cd02c1361b4f6d2446c3e376";
+                String payloadData = null;
+                final String taskName = "Fetch Movie";
+                DataServiceFetch dataSyncAction = new DataServiceFetch(m_DataServiceBasePath+servicePath,
+                        null, payloadData, false);
+                DataSync.DataSyncTask dataSyncTask = new DataSync.DataSyncTask(taskName,dataSyncAction);
+                dataSyncAction.setResponseHandler(new IFetchResponseHandler() {
+                    @Override
+                    public void onResponse(IRESTResponse response) {
+                        Log.d(getClass().toString(), "Executing Response Handler for " + taskName);
+                        processMovieFetchResponse(response);
+                    }
+                });
+                Log.d(getClass().toString(), "Executing Movie Fetch");
+                dataSyncTask.execute();
+            }
+            catch (Exception x) {
+                Log.e(this.getClass().toString(), x.getMessage());
+                broadcastDataServiceEvent(DataServiceBroadcastReceiver.DataServicesEventType.ItemFetchFail, extras);
+            }
+
+        }
+        return UUID.randomUUID();
+    }
+    private void processMovieFetchResponse(IRESTResponse restResponse) {
+        boolean bProcessingCompleted = false;
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
+            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            mapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
+
+            Response response = restResponse.getResponse();
+            if(response!=null) {
+                String jsonData = response.body().string();
+                DTO.MoviesListItem fetchResult = mapper.readValue(jsonData, DTO.MoviesListItem.class);
+                if (fetchResult != null) {
+                    updateMovieData(fetchResult);
+                    HashMap<String, String> extras = new HashMap<String, String>();
+                    extras.put(DataServiceBroadcastReceiver.DataServicesEventExtra.MovieId.toString(), fetchResult.getId().toString());
+                    broadcastDataServiceEvent(DataServiceBroadcastReceiver.DataServicesEventType.ItemFetchSuccess, extras);
+                }
+            }
+        }
+        catch (Exception x) {
+            Log.e(getClass().toString(),x.getMessage());
+        }
     }
     private void processMoviesListFetchResponse(IRESTResponse restResponse) {
         boolean bProcessingCompleted = false;

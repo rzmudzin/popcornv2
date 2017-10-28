@@ -68,6 +68,7 @@ public class DTO {
 
     static public class MoviesListItem {
 
+        private Boolean requiresRefresh=false;
         private Integer voteCount;
         private Integer id;
         private Boolean video;
@@ -89,6 +90,11 @@ public class DTO {
         public MoviesListItem(String movieTitle, int Id) {
             title=movieTitle;
             id=Id;
+        }
+
+        public Boolean getRequiresRefresh() { return requiresRefresh; }
+        public void setRequiresRefresh(Boolean requiresDataRefresh) {
+            requiresRefresh=requiresDataRefresh;
         }
 
         @JsonProperty("vote_count")
