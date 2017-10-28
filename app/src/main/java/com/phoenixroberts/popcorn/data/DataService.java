@@ -269,10 +269,10 @@ public class DataService {
         return uuid;
     }
     //TODO: determine if the discovery endpoint will be used in future iterations of the project - remove if not needed
-    public UUID fetchMoviesDiscoveryData() {
-        return fetchMoviesDiscoveryData(null);
+    public UUID fetchMoviesServiceDiscoveryData() {
+        return fetchMoviesServiceDiscoveryData(null);
     }
-    public UUID fetchMoviesDiscoveryData(String sortOrder) {
+    public UUID fetchMoviesServiceDiscoveryData(String sortOrder) {
         UUID uuid = UUID.randomUUID();
         try {
             String language = "&language=en-US";
@@ -318,7 +318,8 @@ public class DataService {
         else {
 
             try {
-                String servicePath = "movie/" + id.toString() + "?api_key=437c0161cd02c1361b4f6d2446c3e376";
+                String apiKey = "?api_key=" + m_APIKey;
+                String servicePath = "movie/" + id.toString() + apiKey;
                 String payloadData = null;
                 final String taskName = "Fetch Movie";
                 DataServiceFetch dataSyncAction = new DataServiceFetch(m_DataServiceBasePath+servicePath,
